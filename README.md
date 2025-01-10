@@ -1,5 +1,7 @@
 # Sunny GPT ☀️
 
+**Live Demo:** 
+
 ### **Project Description** 📜
 
 Sunny GPT is a visually appealing and interactive chatbot application built using HTML, CSS, and JavaScript.  It features a 3D animated background, a user-friendly interface, and a dark/light mode toggle.  The app allows users to engage in conversations with a large language model (currently a placeholder, using a Google Gemini API endpoint -  replace with your actual API key), save chat history, and switch between different models. The goal is to provide a pleasant and efficient chatbot experience.
@@ -18,7 +20,7 @@ Sunny GPT is a visually appealing and interactive chatbot application built usin
 1.  **Clone the repository:** Clone this project's repository to your local machine using Git:
 
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/JustM3Sunny/Futurestic-Ai.git
     ```
 2.  **Create a directory:** Create a new directory for your project.
 3.  **Navigate to the project folder**: Open your terminal and navigate to the newly created folder.
