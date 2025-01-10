@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunny GPT</title>
+
+    <style>
+        /* Full-page canvas */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            scroll-behavior: smooth;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            display: flex;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #000;
+            width: 100%;
+            height: 100%;
+            z-index: -20; /* Ensure it's behind all other content */
+        }
+
+        body.dark-mode {
+            color: #eee;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: rgba(232, 236, 239, 0.8); /* Add some transparency */
+            border-right: 1px solid #d3d8de;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px); /* Apply blur to the background */
+            z-index: 1; /* Ensure it's above the canvas */
+            height: 100%; /* Added height 100% */
+        }
+
+        body.dark-mode .sidebar {
+            background-color: rgba(37, 37, 37, 0.8);
+            border-right-color: #333;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .avatar img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-info {
+            flex-grow: 1;
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .new-chat-btn {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        body.dark-mode .new-chat-btn {
+            background-color: #0056b3;
+        }
+
+        .old-chats-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .old-chats div {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .old-chats div:hover {
+            background-color: #d3d8de;
+        }
+
+        body.dark-mode .old-chats div:hover {
+            background-color: #333;
+        }
+
+        .chatbot-interface {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(244, 247, 246, 0.7); /* Add transparency */
+            backdrop-filter: blur(10px); /* Apply blur to the background */
+            z-index: 1; /* Ensure it's above the canvas */
+        }
+
+        body.dark-mode .chatbot-interface {
+            background-color: rgba(26, 26, 26, 0.7);
+        }
+
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid #d3d8de;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark-mode .header {
+            border-bottom-color: #333;
+        }
+
+        #model-select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-left: 10px;
+        }
+
+        body.dark-mode #model-select {
+            background-color: #333;
+            color: #eee;
+            border-color: #555;
+        }
+
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        #chat-area {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-bubble {
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            max-width: 70%;
+        }
+
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+
+        body.dark-mode .user-message {
+            background-color: #0056b3;
+        }
+
+        .bot-message {
+            background-color: #e8ecef;
+            align-self: flex-start;
+        }
+
+        body.dark-mode .bot-message {
+            background-color: #333;
+            color: #eee;
+        }
+
+        .message-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .avatar-small {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-color: rgb(255, 255, 255); /* Placeholder */
+        }
+
+        .message-timestamp {
+            font-size: 0.8em;
+            color: #777;
+            margin-left: 10px;
+        }
+
+        body.dark-mode .message-timestamp {
+            color: #bbb;
+        }
+
+        .typing-indicator {
+            align-self: flex-start;
+            margin-bottom: 10px;
+            font-style: italic;
+            color: #777;
+        }
+
+        body.dark-mode .typing-indicator {
+            color: #bbb;
+        }
+
+        .loading-indicator {
+            align-self: center;
+            margin-top: 20px;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid #d3d8de;
+            display: flex;
+            align-items: center;
+            background-color: rgba(244, 247, 246, 0.8); /* Add transparency */
+            backdrop-filter: blur(10px); /* Apply blur to the background */
+            z-index: 1; /* Ensure it's above the canvas */
+        }
+
+        body.dark-mode .chat-input-area {
+            border-top-color: #333;
+            background-color: rgba(26, 26, 26, 0.8);
+        }
+
+        #prompt-input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+
+        body.dark-mode #prompt-input {
+            background-color: #333;
+            color: #eee;
+            border-color: #555;
+        }
+
+        .input-buttons button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            margin-left: 10px;
+        }
+
+        #auto-suggestions {
+            padding: 10px;
+            background-color: rgba(249, 249, 249, 0.8); /* Add transparency */
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-top: 5px;
+            backdrop-filter: blur(10px); /* Apply blur to the background */
+            z-index: 1; /* Ensure it's above the canvas */
+        }
+
+        body.dark-mode #auto-suggestions {
+            background-color: rgba(68, 68, 68, 0.8);
+            color: #eee;
+            border-color: #555;
+        }
+
+        #auto-suggestions span {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-right: 5px;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+            cursor: pointer;
+        }
+
+        body.dark-mode #auto-suggestions span {
+            background-color: #555;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="user-profile">
+            <div class="avatar"> <img src="./av.png" alt=""></div>
+            <div class="user-info">
+                <div>Meee</div>
+            </div>
+            <button class="settings-btn">⚙️</button>
+        </div>
+        <button class="new-chat-btn">New Chat</button>
+        <div class="old-chats-title">Old Chats</div>
+        <div class="old-chats" id="old-chats" style="display: none;">
+        </div>
+    </div>
+    <div class="chatbot-interface">
+        <div class="header">
+            <h1>Sunny GPT</h1>
+            <div>
+                <select id="model-select">
+                    <option>Gemini 1.0 Pro</option>
+                    <option>Gemini 1.5 Pro</option>
+                    <option>Gemini 1.5 Flash 8b</option>
+                    <option>Gemini 1.5 Flash</option>
+                    <option>Gemini 2.0 Flash Exp</option>
+                </select>
+                <button class="theme-toggle-btn">🌙</button>
+            </div>
+        </div>
+        <div id="chat-area">
+            <div class="typing-indicator" style="display: none;">Thinking...</div>
+            <div id="loading" class="loading-indicator" style="display: none;">Loading...</div>
+        </div>
+        <div class="chat-input-area">
+            <textarea id="prompt-input" placeholder="Send a message"></textarea>
+            <div class="input-buttons">
+                <button>🎤</button>
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+        <div id="auto-suggestions" class="auto-suggestions" style="display: none;"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.min.js"></script>
+    <script>
+        // Three.js setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+
+        // Icosahedron geometry and material
+        const geometry = new THREE.IcosahedronGeometry(1, 40);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x00ffcc,
+            wireframe: false,
+            emissive: 0x0044cc,
+            emissiveIntensity: 0.8,
+            shininess: 50,
+            transparent: true,
+            opacity: 0.9,
+        });
+
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
+
+        // Add lighting
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+
+        const ambientLight = new THREE.AmbientLight(0x404040, 1); // Soft ambient light
+        scene.add(ambientLight);
+
+        // Camera position
+        camera.position.z = 3;
+
+        // Scroll-based zoom
+        let targetZ = camera.position.z; // Target zoom level
+        window.addEventListener('wheel', (event) => {
+            if (event.deltaY > 0) {
+                targetZ += 0.5; // Zoom out
+            } else {
+                targetZ -= 0.5; // Zoom in
+            }
+            targetZ = Math.min(Math.max(targetZ, 1.5), 100); // Clamp zoom range
+        });
+
+        // Wave animation for liquid effect
+        const originalPositions = geometry.attributes.position.array.slice(); // Store original positions
+        function animateWave() {
+            const time = performance.now() * 0.001;
+            const position = geometry.attributes.position;
+
+            for (let i = 0; i < position.count; i++) {
+                const ix = i * 3; // X
+                const iy = i * 3 + 1; // Y
+                const iz = i * 3 + 2; // Z
+
+                position.array[iz] =
+                    originalPositions[iz] +
+                    Math.sin(time + originalPositions[ix] * 4 + originalPositions[iy] * 4) * 0.15;
+            }
+            position.needsUpdate = true;
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Smooth zoom
+            camera.position.z += (targetZ - camera.position.z) * 0.1;
+
+            // Rotate the sphere
+            sphere.rotation.x += 0.002;
+            sphere.rotation.y += 0.003;
+
+            // Apply wave effect
+            animateWave();
+
+            // Render the scene
+            renderer.render(scene, camera);
+        }
+
+        // Handle resizing
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+
+        animate();
+
+        const API_URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCWFRHQ3B9A-wERY9QbggKWHffLeHkAuzg"; // Replace with your actual API key
+        const API_KEY = "AIzaSyCWFRHQ3B9A-wERY9QbggKWHffLeHkAuzg"; // Ensure this is handled securely
+
+        const body = document.body;
+        const themeToggleBtn = document.querySelector('.theme-toggle-btn');
+        const chatArea = document.getElementById('chat-area');
+        const promptInput = document.getElementById('prompt-input');
+        const sendBtn = document.getElementById('send-btn');
+        const modelSelect = document.getElementById('model-select');
+        const oldChatsDiv = document.getElementById('old-chats');
+        const newChatBtn = document.querySelector('.new-chat-btn');
+        const autoSuggestionsDiv = document.getElementById('auto-suggestions');
+        const typingIndicator = document.querySelector('.typing-indicator');
+        const loadingIndicator = document.getElementById('loading');
+        const settingsBtn = document.querySelector('.settings-btn'); // Settings button
+
+        let chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+        let currentChat = [];
+
+        function loadTheme() {
+            const darkMode = localStorage.getItem('darkMode') === 'enabled';
+            body.classList.toggle('dark-mode', darkMode);
+            themeToggleBtn.textContent = darkMode ? '☀️' : '🌙';
+        }
+
+        loadTheme();
+
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const darkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', darkMode ? 'enabled' : 'disabled');
+            themeToggleBtn.textContent = darkMode ? '☀️' : '🌙';
+        });
+
+        newChatBtn.addEventListener('click', () => {
+            currentChat = [];
+            chatArea.innerHTML = '';
+            oldChatsDiv.style.display = 'flex'; // Show old chats after new chat
+        });
+
+        function displayMessage(sender, message, timestamp) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message-bubble');
+            messageDiv.classList.add(`${sender}-message`);
+
+            const messageInfoDiv = document.createElement('div');
+            messageInfoDiv.classList.add('message-info');
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.classList.add('avatar-small');
+            messageInfoDiv.appendChild(avatarDiv);
+
+            const messageContent = document.createElement('div');
+            messageContent.textContent = message;
+            messageDiv.appendChild(messageInfoDiv);
+            messageDiv.appendChild(messageContent);
+
+            const timestampSpan = document.createElement('span');
+            timestampSpan.classList.add('message-timestamp');
+            timestampSpan.textContent = timestamp;
+            messageInfoDiv.appendChild(timestampSpan);
+
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const promptText = promptInput.value.trim();
+            if (!promptText) return;
+
+            const selectedModel = modelSelect.value; // Get selected model
+            const timestamp = new Date().toLocaleTimeString();
+            displayMessage('user', promptText, timestamp);
+            currentChat.push({ sender: 'user', text: promptText, timestamp });
+            promptInput.value = '';
+            typingIndicator.style.display = 'block';
+
+            try {
+                // Simulate API call with model selection
+                console.log(`Sending prompt to ${selectedModel}: ${promptText}`);
+                // Replace the following with actual API call using selectedModel if needed
+                const response = await fetch(API_URL_GEMINI, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const botResponseText = data.candidates[0].content.parts[0].text;
+                const botTimestamp = new Date().toLocaleTimeString();
+                displayMessage('bot', botResponseText, botTimestamp);
+                currentChat.push({ sender: 'bot', text: botResponseText, timestamp: botTimestamp });
+            } catch (error) {
+                console.error("Error sending message:", error);
+                displayMessage('bot', "Error: Could not retrieve response.", new Date().toLocaleTimeString());
+            } finally {
+                typingIndicator.style.display = 'none';
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        promptInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Auto-suggestions
+        promptInput.addEventListener('input', () => {
+            const inputText = promptInput.value.trim();
+            if (inputText) {
+                const suggestions = ['Suggest this', 'Try this prompt', 'Another idea']; // Replace with actual logic
+                autoSuggestionsDiv.innerHTML = '';
+                suggestions.forEach(suggestion => {
+                    const suggestionSpan = document.createElement('span');
+                    suggestionSpan.textContent = suggestion;
+                    suggestionSpan.addEventListener('click', () => {
+                        promptInput.value = suggestion;
+                        autoSuggestionsDiv.style.display = 'none';
+                    });
+                    autoSuggestionsDiv.appendChild(suggestionSpan);
+                });
+                autoSuggestionsDiv.style.display = 'block';
+            } else {
+                autoSuggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Voice input (placeholder)
+        document.querySelector('.input-buttons button').addEventListener('click', () => {
+            alert('Voice input not yet implemented.');
+        });
+
+        // Load old chats
+        function loadOldChats() {
+            oldChatsDiv.innerHTML = '';
+            chatHistory.forEach((chat, index) => {
+                if (chat && chat.length > 0 && chat[0].text) {
+                    const chatPreview = document.createElement('div');
+                    chatPreview.textContent = chat[0].text.substring(0, 20) + '...';
+                    chatPreview.addEventListener('click', () => {
+                        currentChat = chat;
+                        chatArea.innerHTML = '';
+                        currentChat.forEach(msg => displayMessage(msg.sender, msg.text, msg.timestamp));
+                    });
+                    oldChatsDiv.appendChild(chatPreview);
+                }
+            });
+        }
+
+        loadOldChats();
+
+        // Save chat history on unload
+        window.addEventListener('beforeunload', () => {
+            if (currentChat.length > 0) {
+                chatHistory.push(currentChat);
+                localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+            }
+        });
+
+        // Settings button (placeholder)
+        settingsBtn.addEventListener('click', () => {
+            alert('Settings functionality not yet implemented.');
+        });
+    </script>
