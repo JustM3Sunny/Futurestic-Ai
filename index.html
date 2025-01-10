@@ -161,6 +161,7 @@
         #chat-area {
             flex-grow: 1;
             padding: 20px;
+            overflow-y: auto; /* Changed from scroll to auto */
             display: flex;
             flex-direction: column;
         }
@@ -203,7 +204,7 @@
             height: 30px;
             border-radius: 50%;
             margin-right: 10px;
-            background-color: rgb(255, 255, 255); /* Placeholder */
+            background-color: #ccc; /* Placeholder */
         }
 
         .message-timestamp {
@@ -261,9 +262,12 @@
             border-color: #555;
         }
 
-        .input-buttons button {
+        .input-buttons button:nth-last-child(2){
             background: none;
-            border: none;
+            border: 1px solid #ccc;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 1.2em;
             margin-left: 10px;
@@ -271,12 +275,12 @@
 
         #auto-suggestions {
             padding: 10px;
-            background-color: rgba(249, 249, 249, 0.8); /* Add transparency */
+            background-color: rgba(249, 249, 249, 0.8); 
             border: 1px solid #eee;
             border-radius: 5px;
             margin-top: 5px;
             backdrop-filter: blur(10px); /* Apply blur to the background */
-            z-index: 1; /* Ensure it's above the canvas */
+            z-index: 1;
         }
 
         body.dark-mode #auto-suggestions {
@@ -518,7 +522,6 @@
             try {
                 // Simulate API call with model selection
                 console.log(`Sending prompt to ${selectedModel}: ${promptText}`);
-                // Replace the following with actual API call using selectedModel if needed
                 const response = await fetch(API_URL_GEMINI, {
                     method: 'POST',
                     headers: {
@@ -559,7 +562,7 @@
         promptInput.addEventListener('input', () => {
             const inputText = promptInput.value.trim();
             if (inputText) {
-                const suggestions = ['Suggest this', 'Try this prompt', 'Another idea']; // Replace with actual logic
+                const suggestions = ['Suggest this', 'Try this prompt', 'Another idea']; 
                 autoSuggestionsDiv.innerHTML = '';
                 suggestions.forEach(suggestion => {
                     const suggestionSpan = document.createElement('span');
