@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunny GPT</title>
 
+
     <style>
         /* Full-page canvas */
         body, html {
@@ -27,7 +28,7 @@
             background-color: #000;
             width: 100%;
             height: 100%;
-            z-index: -20; /* Ensure it's behind all other content */
+            z-index: -20; 
         }
 
         body.dark-mode {
@@ -36,14 +37,14 @@
 
         .sidebar {
             width: 250px;
-            background-color: rgba(232, 236, 239, 0.8); /* Add some transparency */
+            background-color: rgba(232, 236, 239, 0.8);
             border-right: 1px solid #d3d8de;
             padding: 20px;
             display: flex;
             flex-direction: column;
             backdrop-filter: blur(10px); /* Apply blur to the background */
-            z-index: 1; /* Ensure it's above the canvas */
-            height: 100%; /* Added height 100% */
+            z-index: 1; 
+            height: 100%; 
         }
 
         body.dark-mode .sidebar {
@@ -119,7 +120,7 @@
             flex-direction: column;
             background-color: rgba(244, 247, 246, 0.7); /* Add transparency */
             backdrop-filter: blur(10px); /* Apply blur to the background */
-            z-index: 1; /* Ensure it's above the canvas */
+            z-index: 1; 
         }
 
         body.dark-mode .chatbot-interface {
@@ -161,7 +162,7 @@
         #chat-area {
             flex-grow: 1;
             padding: 20px;
-            overflow-y: auto; /* Changed from scroll to auto */
+            overflow-y: scroll;
             display: flex;
             flex-direction: column;
         }
@@ -240,7 +241,7 @@
             align-items: center;
             background-color: rgba(244, 247, 246, 0.8); /* Add transparency */
             backdrop-filter: blur(10px); /* Apply blur to the background */
-            z-index: 1; /* Ensure it's above the canvas */
+            z-index: 1; 
         }
 
         body.dark-mode .chat-input-area {
@@ -262,20 +263,32 @@
             border-color: #555;
         }
 
-        .input-buttons button:nth-last-child(2){
+        .input-buttons {
+            display: flex;
+        }
+
+        .input-buttons button {
             background: none;
             border: 1px solid #ccc;
-            color: white;
-            padding: 5px;
+            color: inherit; /* Use the body's text color */
+            padding: 8px 12px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1.2em;
-            margin-left: 10px;
+            font-size: 1em;
+            margin-left: 5px;
+        }
+
+        .input-buttons button:first-child {
+            margin-left: 0;
+        }
+
+        body.dark-mode .input-buttons button {
+            border-color: #555;
         }
 
         #auto-suggestions {
             padding: 10px;
-            background-color: rgba(249, 249, 249, 0.8); 
+            background-color: rgba(249, 249, 249, 0.8);
             border: 1px solid #eee;
             border-radius: 5px;
             margin-top: 5px;
@@ -293,15 +306,117 @@
             display: inline-block;
             padding: 5px 10px;
             margin-right: 5px;
+            margin-bottom: 5px;
             border-radius: 5px;
             background-color: #e0e0e0;
             cursor: pointer;
+            font-size: 0.9em;
         }
 
         body.dark-mode #auto-suggestions span {
             background-color: #555;
         }
 
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #d3d8de;
+                padding: 10px;
+                height: auto;
+            }
+
+            body.dark-mode .sidebar {
+                border-bottom-color: #333;
+            }
+
+            .user-profile {
+                margin-bottom: 10px;
+                justify-content: space-between;
+            }
+
+            .new-chat-btn {
+                margin-bottom: 10px;
+            }
+
+            .old-chats-title {
+                margin-top: 10px;
+            }
+
+            .chatbot-interface {
+                flex-direction: column;
+            }
+
+            .header {
+                padding: 10px;
+            }
+
+            #chat-area {
+                padding: 10px;
+            }
+
+            .chat-input-area {
+                padding: 10px;
+            }
+
+            #prompt-input {
+                margin-right: 5px;
+            }
+
+            .input-buttons button {
+                font-size: 1em;
+                margin-left: 2px;
+                padding: 6px 8px;
+            }
+
+            #model-select {
+                padding: 6px;
+                font-size: 0.9em;
+                margin-left: 5px;
+            }
+
+            .theme-toggle-btn {
+                font-size: 1em;
+            }
+
+            .message-bubble {
+                max-width: 80%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-info {
+                display: none;
+            }
+
+            .new-chat-btn {
+                font-size: 0.9em;
+                padding: 8px 10px;
+            }
+
+            .old-chats-title {
+                font-size: 0.9em;
+            }
+
+            .old-chats div {
+                font-size: 0.9em;
+                padding: 6px;
+            }
+
+            h1 {
+                font-size: 1.2em;
+            }
+
+            #prompt-input {
+                font-size: 0.9em;
+            }
+
+            #auto-suggestions span {
+                font-size: 0.8em;
+                padding: 4px 8px;
+            }
+        }
     </style>
 </head>
 <body>
