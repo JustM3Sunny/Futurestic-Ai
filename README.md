@@ -70,6 +70,6 @@ Then navigate to `http://localhost:8000` in your browser.
 
 Contributions are welcome!  Feel free to open a pull request or submit issues on GitHub.  Remember to follow the standard contribution guidelines.
 
-### **Developer Signature** ✍️
+### **Developer** ✍️
 
 Developer: **Sunny** | GitHub: **[JustM3Sunny](https://github.com/JustM3Sunny)**
