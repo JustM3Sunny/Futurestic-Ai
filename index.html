@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +14,8 @@
             padding: 0;
             height: 100%;
             width: 100%;
-            overflow: hidden;
+            overflow-x: hidden; /* Prevent horizontal scrollbar */
+            overflow-y: hidden;
             scroll-behavior: smooth;
             font-family: 'Roboto', sans-serif;
             color: #333;
@@ -28,28 +30,50 @@
             background-color: #000;
             width: 100%;
             height: 100%;
-            z-index: -20; 
+            z-index: -20;
         }
 
         body.dark-mode {
             color: #eee;
         }
 
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 12px;
+            left: 13px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: white;
+            cursor: pointer;
+            z-index: 10; /* Ensure it's above the sidebar */
+        }
+
         .sidebar {
             width: 250px;
-            background-color: rgba(232, 236, 239, 0.8);
+            background-color: rgba(232, 236, 239, 0.9);
             border-right: 1px solid #d3d8de;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(10px); /* Apply blur to the background */
-            z-index: 1; 
-            height: 100%; 
+            backdrop-filter: blur(10px);
+            z-index: 5;
+            height: 100%;
+            position: fixed; /* Changed to fixed */
+            top: 0;
+            left: 0;
+            transform: translateX(-100%); /* Initially hidden */
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto; /* Allow scrolling within the sidebar */
         }
 
         body.dark-mode .sidebar {
-            background-color: rgba(37, 37, 37, 0.8);
+            background-color: rgba(37, 37, 37, 0.9);
             border-right-color: #333;
+        }
+
+        .sidebar.open {
+            transform: translateX(0); /* Slide in */
         }
 
         .user-profile {
@@ -94,6 +118,44 @@
             background-color: #0056b3;
         }
 
+        .old-chats-toggle {
+            padding: 10px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .old-chats-toggle::after {
+            content: '>';
+            font-size: 1.2em;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .old-chats-toggle.open::after {
+            transform: rotate(90deg);
+        }
+
+        body.dark-mode .old-chats-toggle {
+            background-color: #5a6268;
+        }
+
+        .old-chats-container {
+            /* Add styles for sliding effect */
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        .old-chats-container.open {
+            max-height: 500px; /* Adjust as needed */
+        }
+
         .old-chats-title {
             margin-bottom: 10px;
             font-weight: bold;
@@ -114,17 +176,64 @@
             background-color: #333;
         }
 
+        .ai-roles {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #d3d8de;
+        }
+
+        body.dark-mode .ai-roles {
+            border-top-color: #333;
+        }
+
+        .ai-roles-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .ai-role-option {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            text-align: center;
+        }
+
+        body.dark-mode .ai-role-option {
+            background-color: #495057;
+            color: #eee;
+            border-color: #6c757d;
+        }
+
+        .ai-role-option.selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        body.dark-mode .ai-role-option.selected {
+            background-color: #0056b3;
+        }
+
         .chatbot-interface {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             background-color: rgba(244, 247, 246, 0.7); /* Add transparency */
             backdrop-filter: blur(10px); /* Apply blur to the background */
-            z-index: 1; 
+            z-index: 1;
+            transition: margin-left 0.3s ease-in-out; /* For shifting content */
         }
 
         body.dark-mode .chatbot-interface {
             background-color: rgba(26, 26, 26, 0.7);
+        }
+
+        .chatbot-interface.sidebar-open {
+            margin-left: 250px; /* Shift content when sidebar is open */
         }
 
         .header {
@@ -162,7 +271,7 @@
         #chat-area {
             flex-grow: 1;
             padding: 20px;
-            overflow-y: scroll;
+            overflow-y: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -241,7 +350,8 @@
             align-items: center;
             background-color: rgba(244, 247, 246, 0.8); /* Add transparency */
             backdrop-filter: blur(10px); /* Apply blur to the background */
-            z-index: 1; 
+            z-index: 1;
+            transition: margin-left 0.3s ease-in-out; /* For shifting content */
         }
 
         body.dark-mode .chat-input-area {
@@ -325,10 +435,15 @@
                 border-bottom: 1px solid #d3d8de;
                 padding: 10px;
                 height: auto;
+                transform: translateX(-100%); /* Keep slide out for smaller screens */
             }
 
             body.dark-mode .sidebar {
                 border-bottom-color: #333;
+            }
+
+            .sidebar.open {
+                transform: translateX(0); /* Slide in */
             }
 
             .user-profile {
@@ -340,12 +455,21 @@
                 margin-bottom: 10px;
             }
 
+            .old-chats-toggle {
+                margin-bottom: 10px;
+            }
+
             .old-chats-title {
                 margin-top: 10px;
             }
 
             .chatbot-interface {
                 flex-direction: column;
+                margin-left: 0; /* Reset margin for smaller screens */
+            }
+
+            .chatbot-interface.sidebar-open {
+                margin-left: 0; /* No shift on smaller screens */
             }
 
             .header {
@@ -395,6 +519,11 @@
                 padding: 8px 10px;
             }
 
+            .old-chats-toggle {
+                font-size: 0.9em;
+                padding: 8px 10px;
+            }
+
             .old-chats-title {
                 font-size: 0.9em;
             }
@@ -420,17 +549,32 @@
     </style>
 </head>
 <body>
+    <button class="sidebar-toggle-btn">☰</button>
     <div class="sidebar">
         <div class="user-profile">
             <div class="avatar"> <img src="./av.png" alt=""></div>
             <div class="user-info">
-                <div>Meee</div>
+                <div>GPT - on steroids 💊</div>
             </div>
             <button class="settings-btn">⚙️</button>
         </div>
         <button class="new-chat-btn">New Chat</button>
-        <div class="old-chats-title">Old Chats</div>
-        <div class="old-chats" id="old-chats" style="display: none;">
+        <button class="old-chats-toggle">
+            <span>Old Chats</span>
+        </button>
+        <div class="old-chats-container">
+            <div class="old-chats-title">Old Chats</div>
+            <div class="old-chats" id="old-chats">
+            </div>
+        </div>
+
+        <div class="ai-roles">
+            <div class="ai-roles-title">AI Roles</div>
+            <div class="ai-role-option" data-role="default">Default</div>
+            <div class="ai-role-option" data-role="teacher">Teacher</div>
+            <div class="ai-role-option" data-role="best friend">Best Friend</div>
+            <div class="ai-role-option" data-role="dumb person">Dumb Person (You)</div>
+            <div class="ai-role-option" data-role="more" style="font-style: italic; color: #777;">More roles soon</div>
         </div>
     </div>
     <div class="chatbot-interface">
@@ -438,11 +582,11 @@
             <h1>Sunny GPT</h1>
             <div>
                 <select id="model-select">
-                    <option>Gemini 1.0 Pro</option>
-                    <option>Gemini 1.5 Pro</option>
-                    <option>Gemini 1.5 Flash 8b</option>
-                    <option>Gemini 1.5 Flash</option>
-                    <option>Gemini 2.0 Flash Exp</option>
+                    <option>Gemini 1.0 Pro (Dumb)</option>
+                    <option>Gemini 1.5 Pro (Mid-Dumb)</option>
+                    <option>Gemini 1.5 Flash 8b (Maybe)</option>
+                    <option>Gemini 1.5 Flash (Smart)</option>
+                    <option>Gemini 2.0 Flash Exp (Recommended)</option>
                 </select>
                 <button class="theme-toggle-btn">🌙</button>
             </div>
@@ -567,14 +711,21 @@
         const sendBtn = document.getElementById('send-btn');
         const modelSelect = document.getElementById('model-select');
         const oldChatsDiv = document.getElementById('old-chats');
+        const oldChatsContainer = document.querySelector('.old-chats-container');
+        const oldChatsToggleBtn = document.querySelector('.old-chats-toggle');
         const newChatBtn = document.querySelector('.new-chat-btn');
         const autoSuggestionsDiv = document.getElementById('auto-suggestions');
         const typingIndicator = document.querySelector('.typing-indicator');
         const loadingIndicator = document.getElementById('loading');
         const settingsBtn = document.querySelector('.settings-btn'); // Settings button
+        const aiRoleOptions = document.querySelectorAll('.ai-role-option');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggleBtn = document.querySelector('.sidebar-toggle-btn');
+        const chatbotInterface = document.querySelector('.chatbot-interface');
 
         let chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
         let currentChat = [];
+        let selectedRole = 'default';
 
         function loadTheme() {
             const darkMode = localStorage.getItem('darkMode') === 'enabled';
@@ -594,7 +745,17 @@
         newChatBtn.addEventListener('click', () => {
             currentChat = [];
             chatArea.innerHTML = '';
-            oldChatsDiv.style.display = 'flex'; // Show old chats after new chat
+            // oldChatsDiv.style.display = 'flex'; // handled by toggle
+        });
+
+        oldChatsToggleBtn.addEventListener('click', () => {
+            oldChatsContainer.classList.toggle('open');
+            oldChatsToggleBtn.classList.toggle('open');
+        });
+
+        sidebarToggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            chatbotInterface.classList.toggle('sidebar-open');
         });
 
         function displayMessage(sender, message, timestamp) {
@@ -629,21 +790,29 @@
 
             const selectedModel = modelSelect.value; // Get selected model
             const timestamp = new Date().toLocaleTimeString();
+            let fullPrompt = promptText;
+            if (selectedRole === 'teacher') {
+                fullPrompt = `Act as a strict Indian teacher. Speak in Hindi, scold me, and be very demanding. ${promptText}`;
+            } else if (selectedRole === 'best friend') {
+                fullPrompt = `Act as Boy indian best friend Chat on hindi do be silly And dont be too smart Be funny.please don't use the word "everything". Okay, so,  ${promptText}`;
+            }else if (selectedRole === 'dumb person') {
+                fullPrompt = `Act as a dumb person chat in hindi.Your Are not smart say silly things. Dont try to be smart or intelligent. Be as dumb as possible. ${promptText}`;
+            }
             displayMessage('user', promptText, timestamp);
             currentChat.push({ sender: 'user', text: promptText, timestamp });
             promptInput.value = '';
             typingIndicator.style.display = 'block';
 
             try {
-                // Simulate API call with model selection
-                console.log(`Sending prompt to ${selectedModel}: ${promptText}`);
+                
+                console.log(`Sending prompt to ${selectedModel}: ${fullPrompt}`);
                 const response = await fetch(API_URL_GEMINI, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }]
+                        contents: [{ parts: [{ text: fullPrompt }] }]
                     })
                 });
 
@@ -677,7 +846,7 @@
         promptInput.addEventListener('input', () => {
             const inputText = promptInput.value.trim();
             if (inputText) {
-                const suggestions = ['Suggest this', 'Try this prompt', 'Another idea']; 
+                const suggestions = ['Suggest this', 'Try this prompt', 'Another idea'];
                 autoSuggestionsDiv.innerHTML = '';
                 suggestions.forEach(suggestion => {
                     const suggestionSpan = document.createElement('span');
@@ -696,7 +865,33 @@
 
         // Voice input (placeholder)
         document.querySelector('.input-buttons button').addEventListener('click', () => {
-            alert('Voice input not yet implemented.');
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+                recognition.continuous = true;
+
+                recognition.start();
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[event.results.length - 1][0].transcript;
+                    promptInput.value = transcript;
+                    sendMessage();
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                };
+
+                recognition.onend = () => {
+                    if (promptInput.value.trim().toLowerCase() !== 'stop') {
+                        recognition.start();
+                    }
+                };
+            } else {
+                alert('Speech recognition not supported in this browser.');
+            }
         });
 
         // Load old chats
@@ -710,6 +905,9 @@
                         currentChat = chat;
                         chatArea.innerHTML = '';
                         currentChat.forEach(msg => displayMessage(msg.sender, msg.text, msg.timestamp));
+                        // Optionally close the old chats panel after selection
+                        oldChatsContainer.classList.remove('open');
+                        oldChatsToggleBtn.classList.remove('open');
                     });
                     oldChatsDiv.appendChild(chatPreview);
                 }
@@ -730,4 +928,16 @@
         settingsBtn.addEventListener('click', () => {
             alert('Settings functionality not yet implemented.');
         });
+
+        // AI Role selection
+        aiRoleOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                aiRoleOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedRole = this.dataset.role;
+                console.log('Selected AI Role:', selectedRole);
+            });
+        });
     </script>
+</body>
+</html>
