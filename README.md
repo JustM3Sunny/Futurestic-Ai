@@ -1,6 +1,6 @@
 # Sunny GPT ☀️
 
-**Live Demo:** **(https://sunnygpt.netlify.app/)**
+**Live Demo:** **[(https://sunnygpt.netlify.app/)](https://steroids-gpt.netlify.app)**
 
 ### **Project Description** 📜
 
