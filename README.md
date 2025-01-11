@@ -1,6 +1,6 @@
 # Sunny GPT ☀️
 
-**Live Demo:** **(https://sunny-frangipane-a9e71a.netlify.app/)**
+**Live Demo:** **(https://sunnygpt.netlify.app/)**
 
 ### **Project Description** 📜
 
